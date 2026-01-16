@@ -21,3 +21,19 @@ export interface IBuyer {
   phone: string;
   address: string;
 }
+
+export type TProductsResponse = {
+  total: number;
+  items: IProduct[];
+}
+
+export type TOrderResponse = {
+  id: string;
+  total: number;
+};
+
+export type TOrderRequest = {
+  items: string[];
+  total: number;
+  buyer: IBuyer;
+};
