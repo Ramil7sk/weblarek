@@ -19,10 +19,6 @@ export class ApiService {
       .then((res) => res.items);
   }
 
-  getProductById(id: string): Promise<IProduct> {
-    return this.api.get<IProduct>(`/product/${id}`);
-  }
-
   sendOrder(order: TOrderRequest): Promise<TOrderResponse> {
     return this.api.post<TOrderResponse>("/order/", order);
   }

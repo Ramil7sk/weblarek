@@ -9,7 +9,7 @@ export class Cart {
     this.items.push(item);
   }
   removeItem(product: IProduct): void {
-    this.items.filter((item) => item.id !== product.id);
+    this.items = this.items.filter((item) => item.id !== product.id);
   }
   clear(): void {
     this.items = [];
