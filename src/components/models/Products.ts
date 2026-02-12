@@ -9,7 +9,7 @@ export class Products {
 
   saveProducts(products: IProduct[]): void {
     this.products = products;
-    this.events.emit('items:changed');
+    this.events.emit('products:changed');
   }
   getProducts(): IProduct[] {
     return this.products;
@@ -19,6 +19,7 @@ export class Products {
   }
   saveSelectedProduct(product: IProduct): void {
     this.selectedProduct = product;
+    this.events.emit('card:selected');
   }
   getSelectedProduct(): IProduct | null {
     return this.selectedProduct;

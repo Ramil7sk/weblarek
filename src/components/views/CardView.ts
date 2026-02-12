@@ -58,8 +58,6 @@ export class GalleryCard extends Card {
     this.container.addEventListener("click", () =>
       this.events.emit("card:open", { id: this.itemId }),
     );
-
-    console.log(this);
     
   }
 
@@ -82,6 +80,37 @@ export class GalleryCard extends Card {
         categoryMap[key as CategoryKey],
         key === value,
       );
+    }
+  }
+}
+
+export class ModalCard extends GalleryCard {
+  protected cardDescription: HTMLElement;
+  protected cardButton: HTMLButtonElement;
+
+  constructor(protected container: HTMLElement, protected events: EventEmitter) {
+    super(container, events);
+    this.cardDescription = ensureElement('.card__text', this.container);
+    this.cardButton = ensureElement('.card__button', this.container) as HTMLButtonElement;
+
+    this.cardButton.addEventListener('click', () => this.events.emit('selectedCard:basketAction', {id: this.itemId}));
+  }
+
+  set buttonText (value: string) {
+    this.cardButton.textContent = value;
+  }
+
+  set description (value: string) {
+    this.cardDescription.textContent = value;
+  }
+
+  set price(value: number | null) {
+    super.price = value;
+    if (value === null) {
+      this.cardButton.setAttribute('disabled', 'disabled');
+      this.cardButton.textContent = 'Недоступно';
+    } else {
+      this.cardButton.removeAttribute('disabled');
     }
   }
 }

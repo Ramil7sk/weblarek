@@ -3,14 +3,14 @@ import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 
 interface IHeader {
-  couner: number;
+  counter: number;
 }
 
 export class Header extends Component<IHeader> {
   protected counterElement: HTMLElement;
   protected basketButton: HTMLButtonElement;
 
-  constructor (protected events:IEvents, container:HTMLElement) {
+  constructor (container:HTMLElement, protected events:IEvents) {
     super(container);
 
     this.counterElement = ensureElement<HTMLElement>('.header__basket-counter', container);
