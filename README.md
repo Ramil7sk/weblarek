@@ -381,3 +381,60 @@ Presenter - презентер содержит основную логику п
 Методы класса:
 `set email(value: string)` - устанавливает email пользователя.
 `set phone(value: string)` - устанавливает номер телефона пользователя.
+
+
+
+
+GalleryCard {container: button.gallery__item.card, itemTitle: h2.card__title, itemPrice: span.card__price, itemId: '', events: EventEmitter, …}
+cardCategory
+: 
+span.card__category.card__category_soft
+cardImage
+: 
+img.card__image
+container
+: 
+button.gallery__item.card
+description
+: 
+"Если планируете решать задачи в тренажёре, берите два."
+events
+: 
+EventEmitter {_events: Map(1)}
+itemId
+: 
+"854cef69-976d-4c2a-a18c-2aa45046c390"
+itemPrice
+: 
+span.card__price
+itemTitle
+: 
+h2.card__title
+
+
+
+
+
+
+{id: '854cef69-976d-4c2a-a18c-2aa45046c390', description: 'Если планируете решать задачи в тренажёре, берите два.', image: '/5_Dots.svg', title: '+1 час в сутках', category: 'софт-скил', …}
+category
+: 
+"софт-скил"
+description
+: 
+"Если планируете решать задачи в тренажёре, берите два."
+id
+: 
+"854cef69-976d-4c2a-a18c-2aa45046c390"
+image
+: 
+"/5_Dots.svg"
+price
+: 
+750
+title
+: 
+"+1 час в сутках"
+[[Prototype]]
+: 
+Object

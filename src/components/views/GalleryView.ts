@@ -1,6 +1,6 @@
 import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
-import { IEvents } from "../base/Events";
+import { EventEmitter } from "../base/Events";
 
 interface IGallery {
   catalog: HTMLElement[]
@@ -9,7 +9,7 @@ interface IGallery {
 export class Gallery extends Component<IGallery> {
   protected catalogElement:HTMLElement;
 
-  constructor (protected events:IEvents, container:HTMLElement) {
+  constructor (container:HTMLElement, protected events:EventEmitter) {
     super(container);
     this.catalogElement = ensureElement<HTMLElement>('.gallery', container);
   }
