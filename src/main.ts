@@ -10,7 +10,12 @@ import { Header } from "./components/views/HeaderView";
 import { EventEmitter } from "./components/base/Events";
 import { Gallery } from "./components/views/GalleryView";
 import { cloneTemplate } from "./utils/utils";
-import { GalleryCard, ModalCard } from "./components/views/CardView";
+import {
+  GalleryCard,
+  ModalCard,
+  BasketCard,
+} from "./components/views/CardView";
+import { CartView } from "./components/views/CartView";
 
 const events = new EventEmitter();
 const api = new Api(API_URL);
@@ -19,6 +24,16 @@ const apiService = new ApiService(api);
 const productsApiModel = new Products(events);
 const CartModel = new Cart(events);
 
+const productGalleryTemplate = document.querySelector(
+  "#card-catalog",
+) as HTMLTemplateElement;
+const cardPreviewTemplate = document.querySelector(
+  "#card-preview",
+) as HTMLTemplateElement;
+const cartTemplate = document.querySelector("#basket") as HTMLTemplateElement;
+const cartBasketTemplate = document.querySelector(
+  "#card-basket",
+) as HTMLTemplateElement;
 
 const modal = new Modal(
   document.querySelector("#modal-container") as HTMLElement,
@@ -31,15 +46,10 @@ const page = new Gallery(
 
 const header = new Header(
   document.querySelector(".header") as HTMLElement,
-  events
-)
+  events,
+);
 
-const productGalleryTemplate = document.querySelector(
-  "#card-catalog",
-) as HTMLTemplateElement;
-const cardPreviewTemplate = document.querySelector(
-  "#card-preview",
-) as HTMLTemplateElement;
+const cart = new CartView(cloneTemplate(cartTemplate), events);
 
 events.on("products:changed", () => {
   const productsArray = productsApiModel
@@ -61,9 +71,8 @@ events.on("card:open", ({ id }: { id: string }) => {
   productsApiModel.saveSelectedProduct(selectedItem);
 });
 
-
 events.on("basket:changed", () => {
-    header.render({counter: CartModel.getItemsCount()} )
+  header.render({ counter: CartModel.getItemsCount() });
 });
 
 events.on("card:selected", () => {
@@ -96,6 +105,26 @@ events.on("selectedCard:basketAction", ({ id }: { id: string }) => {
   } else {
     CartModel.removeItem(addedItem);
   }
+});
+
+events.on("basket:open", () => {
+  const itemsHTMLArray = CartModel.getItems().map((item, index) => {
+    const itemNumber = index + 1;
+    return new BasketCard(cloneTemplate(cartBasketTemplate), events).render(
+      Object.assign({ ...item, itemNumber }),
+    );
+  });
+
+  cart.render({
+    content: itemsHTMLArray,
+    price: CartModel.getTotalPrice(),
+  });
+
+  modal.render({
+    content: cart.render(),
+  });
+
+  modal.open()
 });
 
 try {

@@ -114,3 +114,21 @@ export class ModalCard extends GalleryCard {
     }
   }
 }
+
+export class BasketCard extends Card {
+  protected cardButton: HTMLButtonElement;
+  protected cardIndex: HTMLElement;
+
+  constructor (protected container: HTMLElement, protected events: EventEmitter ) {
+    super(container, events);
+    this.cardButton = ensureElement('.card__button', this.container) as HTMLButtonElement;
+    this.cardIndex = ensureElement('.basket__item-index', this.container);
+
+    this.cardButton.addEventListener('click', () => this.events.emit('selectedItem:basketAction', {id: this.itemId}));
+  }  
+
+  set itemNumber(value: number) {
+    this.cardIndex.textContent = String(value);
+  }
+
+}
