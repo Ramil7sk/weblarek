@@ -24,8 +24,10 @@ export class CartView extends Component<ICart> {
   set content(items: HTMLElement[]) {
     if (items.length) {
       this.cartContent.replaceChildren(...items);
+      this.cartButton.disabled = false;
     } else {
-      this.cartContent.textContent = 'Корзина пуста'
+      this.cartContent.textContent = 'Корзина пуста';
+      this.cartButton.disabled = true;
     }
   }
 

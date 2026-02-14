@@ -72,7 +72,17 @@ events.on("card:open", ({ id }: { id: string }) => {
 });
 
 events.on("basket:changed", () => {
-  header.render({ counter: CartModel.getItemsCount() });
+  header.render({ counter: CartModel.getItemsCount()});
+  const itemsHTMLArray = CartModel.getItems().map((item, index) => {
+    const itemNumber = index + 1;
+    return new BasketCard(cloneTemplate(cartBasketTemplate), events).render(
+      Object.assign({ ...item, itemNumber }),
+    );
+  });
+    cart.render({
+    content: itemsHTMLArray,
+    price: CartModel.getTotalPrice(),
+  });
 });
 
 events.on("card:selected", () => {
@@ -106,6 +116,8 @@ events.on("selectedCard:basketAction", ({ id }: { id: string }) => {
     CartModel.removeItem(addedItem);
   }
 });
+
+
 
 events.on("basket:open", () => {
   const itemsHTMLArray = CartModel.getItems().map((item, index) => {

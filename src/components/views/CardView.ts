@@ -124,7 +124,7 @@ export class BasketCard extends Card {
     this.cardButton = ensureElement('.card__button', this.container) as HTMLButtonElement;
     this.cardIndex = ensureElement('.basket__item-index', this.container);
 
-    this.cardButton.addEventListener('click', () => this.events.emit('selectedItem:basketAction', {id: this.itemId}));
+    this.cardButton.addEventListener('click', () => this.events.emit('selectedCard:basketAction', {id: this.itemId}));
   }  
 
   set itemNumber(value: number) {
