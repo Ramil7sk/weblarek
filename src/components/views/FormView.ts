@@ -71,7 +71,7 @@ export class Form<T> extends Component<IForm> {
 export class OrderForm extends Form<Partial<ICustomer>> {
   protected cardButtonElement: HTMLButtonElement;
   protected cashButtonElement: HTMLButtonElement;
-  protected adressInput: HTMLInputElement;
+  protected addressInput: HTMLInputElement;
 
   constructor(
     protected container: HTMLFormElement,
@@ -86,7 +86,7 @@ export class OrderForm extends Form<Partial<ICustomer>> {
       'button[name="cash"]',
       this.container,
     ) as HTMLButtonElement;
-    this.adressInput = ensureElement(
+    this.addressInput = ensureElement(
       ".form__input",
       this.container,
     ) as HTMLInputElement;
@@ -108,7 +108,7 @@ export class OrderForm extends Form<Partial<ICustomer>> {
   }
 
   set address(value: string) {
-    this.adressInput.value = value;
+    this.addressInput.value = value;
   }
 }
 
