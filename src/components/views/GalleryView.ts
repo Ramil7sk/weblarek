@@ -3,18 +3,21 @@ import { Component } from "../base/Component";
 import { EventEmitter } from "../base/Events";
 
 interface IGallery {
-  catalog: HTMLElement[]
+  catalog: HTMLElement[];
 }
 
 export class Gallery extends Component<IGallery> {
-  protected catalogElement:HTMLElement;
+  protected catalogElement: HTMLElement;
 
-  constructor (container:HTMLElement, protected events:EventEmitter) {
+  constructor(
+    container: HTMLElement,
+    protected events: EventEmitter,
+  ) {
     super(container);
-    this.catalogElement = ensureElement<HTMLElement>('.gallery', container);
+    this.catalogElement = ensureElement<HTMLElement>(".gallery", container);
   }
 
-  set catalog (items:HTMLElement[]) {
+  set catalog(items: HTMLElement[]) {
     this.catalogElement.replaceChildren(...items);
   }
 }

@@ -23,7 +23,10 @@ export class Form<T> extends Component<IForm> {
     protected events: EventEmitter,
   ) {
     super(container);
-    this.buttonElement = ensureElement('button[type="submit"]', this.container) as HTMLButtonElement;
+    this.buttonElement = ensureElement(
+      'button[type="submit"]',
+      this.container,
+    ) as HTMLButtonElement;
     this.errorElement = ensureElement(
       ".form__errors",
       this.container,
@@ -46,7 +49,7 @@ export class Form<T> extends Component<IForm> {
     this.events.emit(`${this.container.name}.${String(field)}:changed`, {
       field,
       value,
-    });    
+    });
   }
 
   set valid(value: boolean) {
@@ -88,8 +91,8 @@ export class OrderForm extends Form<Partial<ICustomer>> {
       this.container,
     ) as HTMLInputElement;
 
-    this.cardButtonElement.addEventListener("click", (evt: Event) => {    
-      const target = evt.target as HTMLButtonElement;      
+    this.cardButtonElement.addEventListener("click", (evt: Event) => {
+      const target = evt.target as HTMLButtonElement;
       this.onInputChange("payment" as keyof ICustomer, target.name);
     });
 
@@ -99,10 +102,9 @@ export class OrderForm extends Form<Partial<ICustomer>> {
     });
   }
 
-  changeButtonState(isCard: boolean, isCash: boolean) { 
+  changeButtonState(isCard: boolean, isCash: boolean) {
     this.cardButtonElement.classList.toggle("button_alt-active", isCard);
     this.cashButtonElement.classList.toggle("button_alt-active", isCash);
-
   }
 
   set address(value: string) {
@@ -110,22 +112,30 @@ export class OrderForm extends Form<Partial<ICustomer>> {
   }
 }
 
-
 export class ContactForm extends Form<Partial<ICustomer>> {
-    protected emailInput: HTMLInputElement;
-    protected phoneInput: HTMLInputElement;
+  protected emailInput: HTMLInputElement;
+  protected phoneInput: HTMLInputElement;
 
-    constructor(protected container: HTMLFormElement, protected events: EventEmitter) {
-        super(container, events);
-        this.emailInput = ensureElement('input[name="email"]', this.container) as HTMLInputElement;
-        this.phoneInput = ensureElement('input[name="phone"]', this.container) as HTMLInputElement;
-    }
+  constructor(
+    protected container: HTMLFormElement,
+    protected events: EventEmitter,
+  ) {
+    super(container, events);
+    this.emailInput = ensureElement(
+      'input[name="email"]',
+      this.container,
+    ) as HTMLInputElement;
+    this.phoneInput = ensureElement(
+      'input[name="phone"]',
+      this.container,
+    ) as HTMLInputElement;
+  }
 
-    set email(value: string) {
-        this.emailInput.value = value;
-    }
+  set email(value: string) {
+    this.emailInput.value = value;
+  }
 
-    set phone(value: string) {
-        this.phoneInput.value = value;
-    }
+  set phone(value: string) {
+    this.phoneInput.value = value;
+  }
 }

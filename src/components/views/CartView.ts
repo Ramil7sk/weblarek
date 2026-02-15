@@ -3,8 +3,8 @@ import { Component } from "../base/Component";
 import { EventEmitter } from "../base/Events";
 
 interface ICart {
-    content: HTMLElement[];
-    price: number;
+  content: HTMLElement[];
+  price: number;
 }
 
 export class CartView extends Component<ICart> {
@@ -12,13 +12,21 @@ export class CartView extends Component<ICart> {
   protected cartContent: HTMLElement;
   protected cartPrice: HTMLElement;
 
-  constructor(container:HTMLElement, protected events:EventEmitter){
+  constructor(
+    container: HTMLElement,
+    protected events: EventEmitter,
+  ) {
     super(container);
-    this.cartButton = ensureElement('.basket__button', this.container) as HTMLButtonElement;
-    this.cartContent =  ensureElement('.basket__list', this.container);
-    this.cartPrice = ensureElement('.basket__price', this.container);
+    this.cartButton = ensureElement(
+      ".basket__button",
+      this.container,
+    ) as HTMLButtonElement;
+    this.cartContent = ensureElement(".basket__list", this.container);
+    this.cartPrice = ensureElement(".basket__price", this.container);
 
-    this.cartButton.addEventListener('click', () => this.events.emit('basket:submit'));
+    this.cartButton.addEventListener("click", () =>
+      this.events.emit("basket:submit"),
+    );
   }
 
   set content(items: HTMLElement[]) {
@@ -26,7 +34,7 @@ export class CartView extends Component<ICart> {
       this.cartContent.replaceChildren(...items);
       this.cartButton.disabled = false;
     } else {
-      this.cartContent.textContent = 'Корзина пуста';
+      this.cartContent.textContent = "Корзина пуста";
       this.cartButton.disabled = true;
     }
   }
@@ -34,5 +42,4 @@ export class CartView extends Component<ICart> {
   set price(value: number) {
     this.cartPrice.textContent = `${String(value)} синапсов`;
   }
-
 }

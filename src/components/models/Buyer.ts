@@ -8,7 +8,7 @@ export class Buyer {
 
   setBuyerData(data: Partial<IBuyer>): void {
     this.buyer = { ...this.buyer, ...data };
-    this.events.emit('payment:changed', this.buyer);    
+    this.events.emit("payment:changed", this.buyer);
   }
   getBuyerData(): Partial<IBuyer> {
     return this.buyer;

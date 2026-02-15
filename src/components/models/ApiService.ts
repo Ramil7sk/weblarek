@@ -14,9 +14,7 @@ export class ApiService {
   }
 
   getProducts(): Promise<IProduct[]> {
-    return this.api
-      .get<TProductsResponse>("/product")
-      .then((res) => res.items);
+    return this.api.get<TProductsResponse>("/product").then((res) => res.items);
   }
 
   sendOrder(order: TOrderRequest): Promise<TOrderResponse> {

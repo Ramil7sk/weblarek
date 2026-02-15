@@ -5,11 +5,11 @@ export class Products {
   private products: IProduct[] = [];
   private selectedProduct: IProduct | null = null;
 
-  constructor(protected events: IEvents) {};
+  constructor(protected events: IEvents) {}
 
   saveProducts(products: IProduct[]): void {
     this.products = products;
-    this.events.emit('products:changed');
+    this.events.emit("products:changed");
   }
   getProducts(): IProduct[] {
     return this.products;
@@ -19,7 +19,7 @@ export class Products {
   }
   saveSelectedProduct(product: IProduct): void {
     this.selectedProduct = product;
-    this.events.emit('card:selected');
+    this.events.emit("card:selected");
   }
   getSelectedProduct(): IProduct | null {
     return this.selectedProduct;

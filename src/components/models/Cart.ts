@@ -4,7 +4,7 @@ import { IEvents } from "../base/Events";
 export class Cart {
   private items: IProduct[] = [];
 
-   constructor(protected events: IEvents) {}
+  constructor(protected events: IEvents) {}
 
   getItems(): IProduct[] {
     return this.items;
