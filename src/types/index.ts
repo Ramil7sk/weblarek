@@ -32,8 +32,7 @@ export type TOrderResponse = {
   total: number;
 };
 
-export type TOrderRequest = {
+export interface TOrderRequest extends IBuyer {
   items: string[];
   total: number;
-  buyer: IBuyer;
 };

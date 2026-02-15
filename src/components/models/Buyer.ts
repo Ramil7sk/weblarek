@@ -1,9 +1,14 @@
 import { IBuyer } from "../../types";
+import { IEvents } from "../base/Events";
 
 export class Buyer {
   private buyer: Partial<IBuyer> = {};
+
+  constructor(protected events: IEvents) {}
+
   setBuyerData(data: Partial<IBuyer>): void {
     this.buyer = { ...this.buyer, ...data };
+    this.events.emit('payment:changed', this.buyer);    
   }
   getBuyerData(): Partial<IBuyer> {
     return this.buyer;

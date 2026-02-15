@@ -32,7 +32,7 @@ export class CartView extends Component<ICart> {
   }
 
   set price(value: number) {
-    this.cartPrice.textContent = String(value);
+    this.cartPrice.textContent = `${String(value)} синапсов`;
   }
 
 }
