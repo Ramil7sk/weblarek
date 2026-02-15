@@ -65,6 +65,7 @@ const cart = new CartView(cloneTemplate(cartTemplate), events);
 const orderForm = new OrderForm(cloneTemplate(orderFormTemplate), events);
 const contactForm = new ContactForm(cloneTemplate(contactFormTemplate), events);
 
+// добавление карточек на страницу
 events.on('products:changed', () => {
   const productsArray = productsApiModel
     .getProducts()
@@ -73,18 +74,19 @@ events.on('products:changed', () => {
         product,
       ),
     );
-
   page.render({
     catalog: productsArray,
   });
 });
 
+// выбор карточки товара
 events.on('card:open', ({ id }: { id: string }) => {
   const selectedItem = productsApiModel.getProductById(id);
   if (!selectedItem) return;
   productsApiModel.saveSelectedProduct(selectedItem);
 });
 
+// изменение корзины
 events.on('basket:changed', () => {
   header.render({ counter: CartModel.getItemsCount() });
   const itemsHTMLArray = CartModel.getItems().map((item, index) => {
@@ -99,6 +101,7 @@ events.on('basket:changed', () => {
   });
 });
 
+// добавление карточки в модель
 events.on('card:selected', () => {
   const selectedCard = productsApiModel.getSelectedProduct();
 
@@ -117,6 +120,7 @@ events.on('card:selected', () => {
   modal.open();
 });
 
+// добавление и удаление товара из корзины
 events.on('selectedCard:basketAction', ({ id }: { id: string }) => {
   const addedItem = productsApiModel.getProductById(id);
   if (!addedItem) return;
@@ -128,6 +132,7 @@ events.on('selectedCard:basketAction', ({ id }: { id: string }) => {
   }
 });
 
+// открытие модального окна с формой заказа
 events.on('basket:submit', () => {
   const formHTML = orderForm.render({
     address: '',
@@ -139,6 +144,7 @@ events.on('basket:submit', () => {
   });
 });
 
+// открытие модального окна с корзиной
 events.on('basket:open', () => {
   const itemsHTMLArray = CartModel.getItems().map((item, index) => {
     const itemNumber = index + 1;
@@ -206,9 +212,7 @@ events.on(
   (data: { field: keyof ICustomer; value: string }) => {
     BuerModel.setBuyerData({ [data.field]: data.value });
 
-    const currentErrors = BuerModel.validate(); // валидируем всю модель
-
-    // Собираем только нужные ошибки для этой формы
+    const currentErrors = BuerModel.validate(); 
     const errors = [currentErrors.email, currentErrors.phone].filter(
       Boolean,
     ) as string[];
@@ -220,6 +224,7 @@ events.on(
   },
 );
 
+// подтверждение заказа и отправка данных на сервер
 events.on('contacts:submit', () => {
   const userData = BuerModel.getBuyerData();
 
