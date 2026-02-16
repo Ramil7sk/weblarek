@@ -19,6 +19,7 @@ export class Cart {
   }
   clear(): void {
     this.items = [];
+    this.events.emit("basket:changed");
   }
   getTotalPrice(): number {
     return this.items.reduce((sum, item) => sum + (item.price ?? 0), 0);

@@ -250,7 +250,26 @@ events.on('contacts:submit', () => {
 
 });
 
-// Получение данных о товарах с сервера
+// обработка очистки модели buer
+
+events.on('buyer:changed', () => {
+      orderForm.render({
+      address: '',
+      valid: false,
+      errors: [],
+    });
+
+    contactForm.render({
+      email: '',
+      phone: '',
+      valid: false,
+      errors: [],
+    });
+
+    orderForm.changeButtonState(false, false);
+})
+
+// получение данных о товарах с сервера
 try {
   const products = await apiService.getProducts();
 

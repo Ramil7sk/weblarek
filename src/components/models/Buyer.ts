@@ -2,7 +2,7 @@ import { IBuyer } from "../../types";
 import { IEvents } from "../base/Events";
 
 export class Buyer {
-  private buyer: Partial<IBuyer> = {};
+  private buyer: IBuyer = { payment: "", email: "", phone: "", address: "" };
 
   constructor(protected events: IEvents) {}
 
@@ -10,11 +10,12 @@ export class Buyer {
     this.buyer = { ...this.buyer, ...data };
     this.events.emit("payment:changed", this.buyer);
   }
-  getBuyerData(): Partial<IBuyer> {
+  getBuyerData(): IBuyer {
     return this.buyer;
   }
   clear(): void {
-    this.buyer = {};
+    this.buyer = { payment: "", email: "", phone: "", address: "" };
+    this.events.emit('buyer:changed', this.buyer);
   }
   validate(): Partial<Record<keyof IBuyer, string>> {
     const errors: Partial<Record<keyof IBuyer, string>> = {};

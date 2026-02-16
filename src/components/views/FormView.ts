@@ -39,7 +39,7 @@ export class Form<T> extends Component<IForm> {
       this.onInputChange(field, value);
     });
 
-    this.buttonElement.addEventListener("click", (evt: Event) => {
+    this.container.addEventListener("submit", (evt: Event) => {
       evt.preventDefault();
       this.events.emit(`${this.container.name}:submit`);
     });

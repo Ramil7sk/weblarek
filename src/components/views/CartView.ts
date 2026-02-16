@@ -34,7 +34,6 @@ export class CartView extends Component<ICart> {
       this.cartContent.replaceChildren(...items);
       this.cartButton.disabled = false;
     } else {
-      this.cartContent.textContent = "Корзина пуста";
       this.cartButton.disabled = true;
     }
   }
