@@ -6,17 +6,23 @@ export class Buyer {
 
   constructor(protected events: IEvents) {}
 
+  // Метод для обновления данных покупателя
   setBuyerData(data: Partial<IBuyer>): void {
     this.buyer = { ...this.buyer, ...data };
-    this.events.emit("payment:changed", this.buyer);
+    this.events.emit("buyer:changed", this.buyer);
   }
+
   getBuyerData(): IBuyer {
     return this.buyer;
   }
+
+  // Очистка модели
   clear(): void {
     this.buyer = { payment: "", email: "", phone: "", address: "" };
-    this.events.emit('buyer:changed', this.buyer);
+    this.events.emit("buyer:changed", this.buyer);
   }
+
+  // Валидация модели
   validate(): Partial<Record<keyof IBuyer, string>> {
     const errors: Partial<Record<keyof IBuyer, string>> = {};
 

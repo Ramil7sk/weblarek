@@ -1,5 +1,4 @@
 import "./scss/styles.scss";
-import { ICustomer } from "./components/views/FormView";
 import { Products } from "./components/models/Products";
 import { Buyer } from "./components/models/Buyer";
 import { Cart } from "./components/models/Cart";
@@ -11,7 +10,11 @@ import { Header } from "./components/views/HeaderView";
 import { EventEmitter } from "./components/base/Events";
 import { Gallery } from "./components/views/GalleryView";
 import { cloneTemplate } from "./utils/utils";
-import { GalleryCard, ModalCard, BasketCard } from "./components/views/CardView";
+import {
+  GalleryCard,
+  ModalCard,
+  BasketCard,
+} from "./components/views/CardView";
 import { Success } from "./components/views/SuccessView";
 import { CartView } from "./components/views/CartView";
 import { OrderForm, ContactForm } from "./components/views/FormView";
@@ -25,17 +28,38 @@ const buerModel = new Buyer(events);
 const productsApiModel = new Products(events);
 const cartModel = new Cart(events);
 
-const productGalleryTemplate = document.querySelector("#card-catalog") as HTMLTemplateElement;
-const cardPreviewTemplate = document.querySelector("#card-preview") as HTMLTemplateElement;
+const productGalleryTemplate = document.querySelector(
+  "#card-catalog",
+) as HTMLTemplateElement;
+const cardPreviewTemplate = document.querySelector(
+  "#card-preview",
+) as HTMLTemplateElement;
 const cartTemplate = document.querySelector("#basket") as HTMLTemplateElement;
-const cartBasketTemplate = document.querySelector("#card-basket") as HTMLTemplateElement;
-const orderFormTemplate = document.querySelector("#order") as HTMLTemplateElement;
-const contactFormTemplate = document.querySelector("#contacts") as HTMLTemplateElement;
-const successTemplate = document.querySelector("#success") as HTMLTemplateElement;
+const cartBasketTemplate = document.querySelector(
+  "#card-basket",
+) as HTMLTemplateElement;
+const orderFormTemplate = document.querySelector(
+  "#order",
+) as HTMLTemplateElement;
+const contactFormTemplate = document.querySelector(
+  "#contacts",
+) as HTMLTemplateElement;
+const successTemplate = document.querySelector(
+  "#success",
+) as HTMLTemplateElement;
 
-const modal = new Modal(document.querySelector("#modal-container") as HTMLElement, events);
-const page = new Gallery(document.querySelector(".page__wrapper") as HTMLElement, events);
-const header = new Header(document.querySelector(".header") as HTMLElement, events);
+const modal = new Modal(
+  document.querySelector("#modal-container") as HTMLElement,
+  events,
+);
+const page = new Gallery(
+  document.querySelector(".page__wrapper") as HTMLElement,
+  events,
+);
+const header = new Header(
+  document.querySelector(".header") as HTMLElement,
+  events,
+);
 const cart = new CartView(cloneTemplate(cartTemplate), events);
 const orderForm = new OrderForm(cloneTemplate(orderFormTemplate), events);
 const contactForm = new ContactForm(cloneTemplate(contactFormTemplate), events);
@@ -76,7 +100,7 @@ let currentProduct: IProduct | null = null;
 const modalCard = new ModalCard(cloneTemplate(cardPreviewTemplate), {
   onClick: () => {
     if (!currentProduct) return;
-      events.emit("selectedCard:basketAction", currentProduct);
+    events.emit("selectedCard:basketAction", currentProduct);
   },
 });
 
@@ -111,9 +135,9 @@ events.on("selectedCard:basketAction", (selectedCard: IProduct) => {
 });
 
 // открытие модального окна с формой заказа
-events.on('basket:submit', () => {
+events.on("basket:submit", () => {
   const formHTML = orderForm.render({
-    address: '',
+    address: "",
     valid: false,
     errors: [],
   });
@@ -121,13 +145,12 @@ events.on('basket:submit', () => {
     content: formHTML,
   });
 });
-
 
 // Подтверждение формы заказа
-events.on('order:submit', () => {
+events.on("order:submit", () => {
   const formHTML = contactForm.render({
-    email: '',
-    phone: '',
+    email: "",
+    phone: "",
     valid: false,
     errors: [],
   });
@@ -135,21 +158,18 @@ events.on('order:submit', () => {
     content: formHTML,
   });
 });
-
-
-
 
 // изменение корзины
 events.on("basket:changed", () => {
-    header.render({ counter: cartModel.getItemsCount() });
-    const itemsHTMLArray = cartModel.getItems().map((item, index) => {
-      const itemNumber = index + 1;
-      return new BasketCard(cloneTemplate(cartBasketTemplate), {
-        onClick: () => {
-          events.emit("selectedCard:basketAction", item);
-        },
-      }).render({ ...item, itemNumber });
-    });
+  header.render({ counter: cartModel.getItemsCount() });
+  const itemsHTMLArray = cartModel.getItems().map((item, index) => {
+    const itemNumber = index + 1;
+    return new BasketCard(cloneTemplate(cartBasketTemplate), {
+      onClick: () => {
+        events.emit("selectedCard:basketAction", item);
+      },
+    }).render({ ...item, itemNumber });
+  });
 
   updateModalButton();
 
@@ -162,38 +182,21 @@ events.on("basket:open", () => {
   modal.open();
 });
 
-events.on("buyer:changed", () => {
-  const buyer = buerModel.getBuyerData();
-  const currentErrors = buerModel.validate();
-  const errors = [
-    currentErrors.address,
-    currentErrors.payment,
-    currentErrors.email,
-    currentErrors.phone,
-  ].filter(Boolean) as string[];
-
-  orderForm.render({ valid: errors.length === 0, errors });
-  orderForm.address = buyer.address || "";
-  orderForm.changeButtonState(buyer.payment === "card", buyer.payment === "cash");
-
-  contactForm.render({ valid: errors.length === 0, errors });
-  contactForm.email = buyer.email || "";
-  contactForm.phone = buyer.phone || "";
-});
-
-
 // Изменился способ оплаты
 events.on("payment:changed", (buyer: IBuyer) => {
   if (buyer.payment) {
-    orderForm.changeButtonState(buyer.payment === "card", buyer.payment === "cash");
+    orderForm.changeButtonState(
+      buyer.payment === "card",
+      buyer.payment === "cash",
+    );
   }
 });
 
 // Подтверждение формы заказа
-events.on('order:submit', () => {
+events.on("order:submit", () => {
   const formHTML = contactForm.render({
-    email: '',
-    phone: '',
+    email: "",
+    phone: "",
     valid: false,
     errors: [],
   });
@@ -205,41 +208,42 @@ events.on('order:submit', () => {
 // Изменилось одно из полей формы order
 events.on(
   /^order\..*:changed/,
-  (data: { field: keyof ICustomer; value: string }) => {
+  (data: { field: keyof IBuyer; value: string }) => {
     buerModel.setBuyerData({ [data.field]: data.value });
-    const currentErrors = buerModel.validate();
-
-    const errors = [currentErrors.address, currentErrors.payment].filter(
-      Boolean,
-    ) as string[];
-
-    orderForm.render({
-      valid: errors.length === 0,
-      errors,
-    });
   },
 );
 
 // Изменилось одно из полей формы contacts
 events.on(
   /^contacts\..*:changed/,
-  (data: { field: keyof ICustomer; value: string }) => {
+  (data: { field: keyof IBuyer; value: string }) => {
     buerModel.setBuyerData({ [data.field]: data.value });
-
-    const currentErrors = buerModel.validate(); 
-    const errors = [currentErrors.email, currentErrors.phone].filter(
-      Boolean,
-    ) as string[];
-
-    contactForm.render({
-      valid: errors.length === 0,
-      errors,
-    });
   },
-);;
+);
 
-
-// подтверждение заказа и отправка данных на сервер
+events.on("buyer:changed", () => {
+  const buyer = buerModel.getBuyerData();
+  const currentErrors = buerModel.validate();
+  orderForm.address = buyer.address;
+  orderForm.changeButtonState(
+    buyer.payment === "card",
+    buyer.payment === "cash",
+  );
+  orderForm.render({
+    valid: !currentErrors.address && !currentErrors.payment,
+    errors: [currentErrors.address, currentErrors.payment].filter(
+      Boolean,
+    ) as string[],
+  });
+  contactForm.email = buyer.email;
+  contactForm.phone = buyer.phone;
+  contactForm.render({
+    valid: !currentErrors.email && !currentErrors.phone,
+    errors: [currentErrors.email, currentErrors.phone].filter(
+      Boolean,
+    ) as string[],
+  });
+});
 
 const successComponent = new Success(cloneTemplate(successTemplate), {
   onClick: () => modal.close(),
@@ -248,23 +252,25 @@ const successComponent = new Success(cloneTemplate(successTemplate), {
 events.on("contacts:submit", () => {
   const userData = buerModel.getBuyerData();
 
-  apiService.sendOrder({
-    items: cartModel.getItems().map((item) => item.id),
-    total: cartModel.getTotalPrice(),
-    ...(userData as IBuyer),
-  }).then(result => {
-    const successHTML = successComponent.render(result);
-    modal.render({ content: successHTML });
-  });
-
-  header.render({ counter: 0 });
-  cartModel.clear();
-  buerModel.clear();
-  modal.clear();
-  orderForm.changeButtonState(false, false);
+  apiService
+    .sendOrder({
+      items: cartModel.getItems().map((item) => item.id),
+      total: cartModel.getTotalPrice(),
+      ...(userData as IBuyer),
+    })
+    .then((result) => {
+      const successHTML = successComponent.render(result);
+      modal.render({ content: successHTML });
+      modal.open();
+      buerModel.clear();
+      cartModel.clear();
+      header.render({ counter: 0 });
+    })
+    .catch((error) => {
+      console.error("Ошибка при отправке заказа:", error);
+      alert("Не удалось оформить заказ. Попробуйте снова.");
+    });
 });
-
-
 
 // получение данных о товарах с сервера
 try {
