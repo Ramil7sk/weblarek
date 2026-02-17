@@ -1,134 +1,112 @@
-import './scss/styles.scss';
-import { ICustomer } from './components/views/FormView';
-import { Products } from './components/models/Products';
-import { Buyer } from './components/models/Buyer';
-import { Cart } from './components/models/Cart';
-import { Api } from './components/base/Api';
-import { ApiService } from './components/models/ApiService';
-import { API_URL } from './utils/constants';
-import { Modal } from './components/views/ModalView';
-import { Header } from './components/views/HeaderView';
-import { EventEmitter } from './components/base/Events';
-import { Gallery } from './components/views/GalleryView';
-import { cloneTemplate } from './utils/utils';
-import {
-  GalleryCard,
-  ModalCard,
-  BasketCard,
-} from './components/views/CardView';
-import { Success } from './components/views/SuccessView';
-import { CartView } from './components/views/CartView';
-import { OrderForm, ContactForm } from './components/views/FormView';
-import { IBuyer } from './types';
+import "./scss/styles.scss";
+import { ICustomer } from "./components/views/FormView";
+import { Products } from "./components/models/Products";
+import { Buyer } from "./components/models/Buyer";
+import { Cart } from "./components/models/Cart";
+import { Api } from "./components/base/Api";
+import { ApiService } from "./components/models/ApiService";
+import { API_URL } from "./utils/constants";
+import { Modal } from "./components/views/ModalView";
+import { Header } from "./components/views/HeaderView";
+import { EventEmitter } from "./components/base/Events";
+import { Gallery } from "./components/views/GalleryView";
+import { cloneTemplate } from "./utils/utils";
+import { GalleryCard, ModalCard, BasketCard } from "./components/views/CardView";
+import { Success } from "./components/views/SuccessView";
+import { CartView } from "./components/views/CartView";
+import { OrderForm, ContactForm } from "./components/views/FormView";
+import { IBuyer } from "./types";
+import { IProduct } from "./types";
 
 const events = new EventEmitter();
 const api = new Api(API_URL);
 const apiService = new ApiService(api);
-const BuerModel = new Buyer(events);
+const buerModel = new Buyer(events);
 const productsApiModel = new Products(events);
-const CartModel = new Cart(events);
+const cartModel = new Cart(events);
 
-const productGalleryTemplate = document.querySelector(
-  '#card-catalog',
-) as HTMLTemplateElement;
-const cardPreviewTemplate = document.querySelector(
-  '#card-preview',
-) as HTMLTemplateElement;
-const cartTemplate = document.querySelector('#basket') as HTMLTemplateElement;
-const cartBasketTemplate = document.querySelector(
-  '#card-basket',
-) as HTMLTemplateElement;
-const orderFormTemplate = document.querySelector(
-  '#order',
-) as HTMLTemplateElement;
-const contactFormTemplate = document.querySelector(
-  '#contacts',
-) as HTMLTemplateElement;
-const successTemplate = document.querySelector(
-  '#success',
-) as HTMLTemplateElement;
+const productGalleryTemplate = document.querySelector("#card-catalog") as HTMLTemplateElement;
+const cardPreviewTemplate = document.querySelector("#card-preview") as HTMLTemplateElement;
+const cartTemplate = document.querySelector("#basket") as HTMLTemplateElement;
+const cartBasketTemplate = document.querySelector("#card-basket") as HTMLTemplateElement;
+const orderFormTemplate = document.querySelector("#order") as HTMLTemplateElement;
+const contactFormTemplate = document.querySelector("#contacts") as HTMLTemplateElement;
+const successTemplate = document.querySelector("#success") as HTMLTemplateElement;
 
-const modal = new Modal(
-  document.querySelector('#modal-container') as HTMLElement,
-  events,
-);
-const page = new Gallery(
-  document.querySelector('.page__wrapper') as HTMLElement,
-  events,
-);
-
-const header = new Header(
-  document.querySelector('.header') as HTMLElement,
-  events,
-);
+const modal = new Modal(document.querySelector("#modal-container") as HTMLElement, events);
+const page = new Gallery(document.querySelector(".page__wrapper") as HTMLElement, events);
+const header = new Header(document.querySelector(".header") as HTMLElement, events);
 const cart = new CartView(cloneTemplate(cartTemplate), events);
 const orderForm = new OrderForm(cloneTemplate(orderFormTemplate), events);
 const contactForm = new ContactForm(cloneTemplate(contactFormTemplate), events);
 
+// функция для обновления текста кнопки
+function updateModalButton() {
+  if (!currentProduct) return;
+
+  modalCard.buttonText = cartModel.hasItem(currentProduct.id)
+    ? "Удалить из корзины"
+    : "Купить";
+}
+
 // добавление карточек на страницу
-events.on('products:changed', () => {
-  const productsArray = productsApiModel
-    .getProducts()
-    .map((product) =>
-      new GalleryCard(cloneTemplate(productGalleryTemplate), events).render(
-        product,
-      ),
-    );
-  page.render({
-    catalog: productsArray,
+events.on("products:changed", () => {
+  const products = productsApiModel.getProducts();
+  const cards = products.map((product) => {
+    const card = new GalleryCard(cloneTemplate(productGalleryTemplate), {
+      onClick: () => {
+        events.emit("card:open", product);
+      },
+    });
+    return card.render(product);
   });
+  page.render({ catalog: cards });
 });
 
 // выбор карточки товара
-events.on('card:open', ({ id }: { id: string }) => {
+events.on("card:open", ({ id }: { id: string }) => {
   const selectedItem = productsApiModel.getProductById(id);
   if (!selectedItem) return;
   productsApiModel.saveSelectedProduct(selectedItem);
 });
 
-// изменение корзины
-events.on('basket:changed', () => {
-  header.render({ counter: CartModel.getItemsCount() });
-  const itemsHTMLArray = CartModel.getItems().map((item, index) => {
-    const itemNumber = index + 1;
-    return new BasketCard(cloneTemplate(cartBasketTemplate), events).render(
-      Object.assign({ ...item, itemNumber }),
-    );
-  });
-  cart.render({
-    content: itemsHTMLArray,
-    price: CartModel.getTotalPrice(),
-  });
+//выносим modalCard из обработчика
+let currentProduct: IProduct | null = null;
+
+const modalCard = new ModalCard(cloneTemplate(cardPreviewTemplate), {
+  onClick: () => {
+    if (!currentProduct) return;
+      events.emit("selectedCard:basketAction", currentProduct);
+  },
 });
 
 // добавление карточки в модель
-events.on('card:selected', () => {
+events.on("card:selected", () => {
   const selectedCard = productsApiModel.getSelectedProduct();
-
   if (!selectedCard) return;
-  const cardContent = new ModalCard(
-    cloneTemplate(cardPreviewTemplate),
-    events,
-  ).render({
+
+  currentProduct = selectedCard;
+
+  updateModalButton();
+
+  const cardContentHTML = modalCard.render({
     ...selectedCard,
-    buttonText: CartModel.hasItem(selectedCard.id)
-      ? 'Удалить из корзины'
-      : 'Купить',
+    buttonText: cartModel.hasItem(selectedCard.id)
+      ? "Удалить из корзины"
+      : "Купить",
   });
 
-  modal.render({ content: cardContent });
+  modal.render({ content: cardContentHTML });
   modal.open();
 });
 
 // добавление и удаление товара из корзины
-events.on('selectedCard:basketAction', ({ id }: { id: string }) => {
-  const addedItem = productsApiModel.getProductById(id);
-  if (!addedItem) return;
-
-  if (!CartModel.hasItem(id)) {
-    CartModel.addItem(addedItem);
+events.on("selectedCard:basketAction", (selectedCard: IProduct) => {
+  if (!selectedCard) return;
+  if (!cartModel.hasItem(selectedCard.id)) {
+    cartModel.addItem(selectedCard);
   } else {
-    CartModel.removeItem(addedItem);
+    cartModel.removeItem(selectedCard);
   }
 });
 
@@ -144,52 +122,70 @@ events.on('basket:submit', () => {
   });
 });
 
-// открытие модального окна с корзиной
-events.on('basket:open', () => {
-  const itemsHTMLArray = CartModel.getItems().map((item, index) => {
-    const itemNumber = index + 1;
-    return new BasketCard(cloneTemplate(cartBasketTemplate), events).render(
-      Object.assign({ ...item, itemNumber }),
-    );
-  });
 
-  cart.render({
-    content: itemsHTMLArray,
-    price: CartModel.getTotalPrice(),
+// Подтверждение формы заказа
+events.on('order:submit', () => {
+  const formHTML = contactForm.render({
+    email: '',
+    phone: '',
+    valid: false,
+    errors: [],
   });
-
   modal.render({
-    content: cart.render(),
+    content: formHTML,
   });
+});
 
+
+
+
+// изменение корзины
+events.on("basket:changed", () => {
+    header.render({ counter: cartModel.getItemsCount() });
+    const itemsHTMLArray = cartModel.getItems().map((item, index) => {
+      const itemNumber = index + 1;
+      return new BasketCard(cloneTemplate(cartBasketTemplate), {
+        onClick: () => {
+          events.emit("selectedCard:basketAction", item);
+        },
+      }).render({ ...item, itemNumber });
+    });
+
+  updateModalButton();
+
+  cart.render({ content: itemsHTMLArray, price: cartModel.getTotalPrice() });
+});
+
+// открытие модального окна с корзиной
+events.on("basket:open", () => {
+  modal.render({ content: cart.render() });
   modal.open();
 });
 
-// Изменилось одно из полей формы order
-events.on(
-  /^order\..*:changed/,
-  (data: { field: keyof ICustomer; value: string }) => {
-    BuerModel.setBuyerData({ [data.field]: data.value });
-    const currentErrors = BuerModel.validate();
+events.on("buyer:changed", () => {
+  const buyer = buerModel.getBuyerData();
+  const currentErrors = buerModel.validate();
+  const errors = [
+    currentErrors.address,
+    currentErrors.payment,
+    currentErrors.email,
+    currentErrors.phone,
+  ].filter(Boolean) as string[];
 
-    const errors = [currentErrors.address, currentErrors.payment].filter(
-      Boolean,
-    ) as string[];
+  orderForm.render({ valid: errors.length === 0, errors });
+  orderForm.address = buyer.address || "";
+  orderForm.changeButtonState(buyer.payment === "card", buyer.payment === "cash");
 
-    orderForm.render({
-      valid: errors.length === 0,
-      errors,
-    });
-  },
-);
+  contactForm.render({ valid: errors.length === 0, errors });
+  contactForm.email = buyer.email || "";
+  contactForm.phone = buyer.phone || "";
+});
+
 
 // Изменился способ оплаты
-events.on('payment:changed', (buyer: IBuyer) => {
+events.on("payment:changed", (buyer: IBuyer) => {
   if (buyer.payment) {
-    orderForm.changeButtonState(
-      buyer.payment === 'card',
-      buyer.payment === 'cash',
-    );
+    orderForm.changeButtonState(buyer.payment === "card", buyer.payment === "cash");
   }
 });
 
@@ -206,13 +202,31 @@ events.on('order:submit', () => {
   });
 });
 
+// Изменилось одно из полей формы order
+events.on(
+  /^order\..*:changed/,
+  (data: { field: keyof ICustomer; value: string }) => {
+    buerModel.setBuyerData({ [data.field]: data.value });
+    const currentErrors = buerModel.validate();
+
+    const errors = [currentErrors.address, currentErrors.payment].filter(
+      Boolean,
+    ) as string[];
+
+    orderForm.render({
+      valid: errors.length === 0,
+      errors,
+    });
+  },
+);
+
 // Изменилось одно из полей формы contacts
 events.on(
   /^contacts\..*:changed/,
   (data: { field: keyof ICustomer; value: string }) => {
-    BuerModel.setBuyerData({ [data.field]: data.value });
+    buerModel.setBuyerData({ [data.field]: data.value });
 
-    const currentErrors = BuerModel.validate(); 
+    const currentErrors = buerModel.validate(); 
     const errors = [currentErrors.email, currentErrors.phone].filter(
       Boolean,
     ) as string[];
@@ -222,58 +236,40 @@ events.on(
       errors,
     });
   },
-);
+);;
+
 
 // подтверждение заказа и отправка данных на сервер
-events.on('contacts:submit', () => {
-  const userData = BuerModel.getBuyerData();
 
-  apiService
-    .sendOrder({
-      items: CartModel.getItems().map((item) => item.id),
-      total: CartModel.getTotalPrice(),
-      ...(userData as IBuyer),
-    })
-    .then((result) => {
-      const successHTML = new Success(cloneTemplate(successTemplate), {
-        onClick: () => {
-          modal.close();
-        }
-      }).render(result);
-      modal.render({content:successHTML})
-    });
-    header.render({ counter: 0});
-    CartModel.clear();
-    BuerModel.clear();
-    modal.clear();
-    orderForm.changeButtonState(false, false);
-
+const successComponent = new Success(cloneTemplate(successTemplate), {
+  onClick: () => modal.close(),
 });
 
-// обработка очистки модели buer
+events.on("contacts:submit", () => {
+  const userData = buerModel.getBuyerData();
 
-events.on('buyer:changed', () => {
-      orderForm.render({
-      address: '',
-      valid: false,
-      errors: [],
-    });
+  apiService.sendOrder({
+    items: cartModel.getItems().map((item) => item.id),
+    total: cartModel.getTotalPrice(),
+    ...(userData as IBuyer),
+  }).then(result => {
+    const successHTML = successComponent.render(result);
+    modal.render({ content: successHTML });
+  });
 
-    contactForm.render({
-      email: '',
-      phone: '',
-      valid: false,
-      errors: [],
-    });
+  header.render({ counter: 0 });
+  cartModel.clear();
+  buerModel.clear();
+  modal.clear();
+  orderForm.changeButtonState(false, false);
+});
 
-    orderForm.changeButtonState(false, false);
-})
+
 
 // получение данных о товарах с сервера
 try {
   const products = await apiService.getProducts();
-
   productsApiModel.saveProducts(products);
 } catch (error) {
-  console.error('Ошибка при получении товаров:', error);
+  console.error("Ошибка при получении товаров:", error);
 }

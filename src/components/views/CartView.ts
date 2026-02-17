@@ -30,8 +30,8 @@ export class CartView extends Component<ICart> {
   }
 
   set content(items: HTMLElement[]) {
-    if (items.length) {
-      this.cartContent.replaceChildren(...items);
+    this.cartContent.replaceChildren(...items);
+    if (items.length > 0) {
       this.cartButton.disabled = false;
     } else {
       this.cartButton.disabled = true;
