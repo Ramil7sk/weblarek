@@ -66,9 +66,10 @@ const contactForm = new ContactForm(cloneTemplate(contactFormTemplate), events);
 
 // функция для обновления текста кнопки
 function updateModalButton() {
-  if (!currentProduct) return;
-
-  modalCard.buttonText = cartModel.hasItem(currentProduct.id)
+  const product = productsApiModel.getSelectedProduct();
+  if (!product) return;
+  
+  modalCard.buttonText = cartModel.hasItem(product.id)
     ? "Удалить из корзины"
     : "Купить";
 }
@@ -95,12 +96,10 @@ events.on("card:open", ({ id }: { id: string }) => {
 });
 
 //выносим modalCard из обработчика
-let currentProduct: IProduct | null = null;
 
 const modalCard = new ModalCard(cloneTemplate(cardPreviewTemplate), {
   onClick: () => {
-    if (!currentProduct) return;
-    events.emit("selectedCard:basketAction", currentProduct);
+    events.emit("selectedCard:basketAction");
   },
 });
 
@@ -108,8 +107,6 @@ const modalCard = new ModalCard(cloneTemplate(cardPreviewTemplate), {
 events.on("card:selected", () => {
   const selectedCard = productsApiModel.getSelectedProduct();
   if (!selectedCard) return;
-
-  currentProduct = selectedCard;
 
   updateModalButton();
 
@@ -125,13 +122,15 @@ events.on("card:selected", () => {
 });
 
 // добавление и удаление товара из корзины
-events.on("selectedCard:basketAction", (selectedCard: IProduct) => {
-  if (!selectedCard) return;
-  if (!cartModel.hasItem(selectedCard.id)) {
-    cartModel.addItem(selectedCard);
+events.on("selectedCard:basketAction", () => {
+  const product = productsApiModel.getSelectedProduct();
+  if (!product) return;
+  if (!cartModel.hasItem(product.id)) {
+    cartModel.addItem(product);
   } else {
-    cartModel.removeItem(selectedCard);
+    cartModel.removeItem(product);
   }
+  updateModalButton();
 });
 
 // открытие модального окна с формой заказа
@@ -171,7 +170,7 @@ events.on("basket:changed", () => {
     }).render({ ...item, itemNumber });
   });
 
-  updateModalButton();
+  // updateModalButton();
 
   cart.render({ content: itemsHTMLArray, price: cartModel.getTotalPrice() });
 });
