@@ -18,7 +18,7 @@ import {
 import { Success } from "./components/views/SuccessView";
 import { CartView } from "./components/views/CartView";
 import { OrderForm, ContactForm } from "./components/views/FormView";
-import { IBuyer } from "./types";
+import { IBuyer, IProduct } from "./types";
 
 const events = new EventEmitter();
 const api = new Api(API_URL);
@@ -167,7 +167,7 @@ events.on("basket:changed", () => {
     const itemNumber = index + 1;
     return new BasketCard(cloneTemplate(cartBasketTemplate), {
       onClick: () => {
-        events.emit("selectedCard:basketAction", item);
+        events.emit("basket:remove", item);
       },
     }).render({ ...item, itemNumber });
   });
@@ -175,6 +175,11 @@ events.on("basket:changed", () => {
   // updateModalButton();
 
   cart.render({ content: itemsHTMLArray, price: cartModel.getTotalPrice() });
+});
+
+//удаление товара из корзины
+events.on("basket:remove", (product:IProduct) => {
+  cartModel.removeItem(product);
 });
 
 // открытие модального окна с корзиной
