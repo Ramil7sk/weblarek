@@ -19,12 +19,11 @@ import { Success } from "./components/views/SuccessView";
 import { CartView } from "./components/views/CartView";
 import { OrderForm, ContactForm } from "./components/views/FormView";
 import { IBuyer } from "./types";
-import { IProduct } from "./types";
 
 const events = new EventEmitter();
 const api = new Api(API_URL);
 const apiService = new ApiService(api);
-const buerModel = new Buyer(events);
+const buyerModel = new Buyer(events);
 const productsApiModel = new Products(events);
 const cartModel = new Cart(events);
 
@@ -135,26 +134,29 @@ events.on("selectedCard:basketAction", () => {
 
 // открытие модального окна с формой заказа
 events.on("basket:submit", () => {
-  const formHTML = orderForm.render({
-    address: "",
-    valid: false,
-    errors: [],
-  });
+  const buyer = buyerModel.getBuyerData();
+ 
   modal.render({
-    content: formHTML,
+    content: orderForm.render({
+      address: buyer.address,
+      payment: buyer.payment,
+      valid: false,
+      errors: [],  
+    }),
   });
 });
 
 // Подтверждение формы заказа
 events.on("order:submit", () => {
-  const formHTML = contactForm.render({
-    email: "",
-    phone: "",
-    valid: false,
-    errors: [],
-  });
+  const buyer = buyerModel.getBuyerData();
+ 
   modal.render({
-    content: formHTML,
+    content: orderForm.render({
+      email: buyer.email,
+      phone: buyer.phone,
+      valid: false,
+      errors: [],  
+    }),
   });
 });
 
@@ -179,6 +181,7 @@ events.on("basket:changed", () => {
 events.on("basket:open", () => {
   modal.render({ content: cart.render() });
   modal.open();
+  
 });
 
 // Изменился способ оплаты
@@ -208,7 +211,7 @@ events.on("order:submit", () => {
 events.on(
   /^order\..*:changed/,
   (data: { field: keyof IBuyer; value: string }) => {
-    buerModel.setBuyerData({ [data.field]: data.value });
+    buyerModel.setBuyerData({ [data.field]: data.value });
   },
 );
 
@@ -216,13 +219,13 @@ events.on(
 events.on(
   /^contacts\..*:changed/,
   (data: { field: keyof IBuyer; value: string }) => {
-    buerModel.setBuyerData({ [data.field]: data.value });
+    buyerModel.setBuyerData({ [data.field]: data.value });
   },
 );
 
 events.on("buyer:changed", () => {
-  const buyer = buerModel.getBuyerData();
-  const currentErrors = buerModel.validate();
+  const buyer = buyerModel.getBuyerData();
+  const currentErrors = buyerModel.validate();
   orderForm.address = buyer.address;
   orderForm.changeButtonState(
     buyer.payment === "card",
@@ -249,7 +252,7 @@ const successComponent = new Success(cloneTemplate(successTemplate), {
 });
 
 events.on("contacts:submit", () => {
-  const userData = buerModel.getBuyerData();
+  const userData = buyerModel.getBuyerData();
 
   apiService
     .sendOrder({
@@ -261,7 +264,7 @@ events.on("contacts:submit", () => {
       const successHTML = successComponent.render(result);
       modal.render({ content: successHTML });
       modal.open();
-      buerModel.clear();
+      buyerModel.clear();
       cartModel.clear();
       header.render({ counter: 0 });
     })

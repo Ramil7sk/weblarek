@@ -1,6 +1,7 @@
 import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { EventEmitter } from "../base/Events";
+import { TPayment } from "../../types";
 
 interface IForm {
   valid: boolean;
@@ -10,7 +11,7 @@ interface IForm {
 export interface ICustomer {
   email: string;
   phone: string;
-  payment: "online" | "cash";
+  payment: TPayment;
   address: string;
 }
 
