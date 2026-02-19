@@ -27,6 +27,8 @@ export class CartView extends Component<ICart> {
     this.cartButton.addEventListener("click", () =>
       this.events.emit("basket:submit"),
     );
+    
+    this.cartButton.disabled = true;
   }
 
   set content(items: HTMLElement[]) {
