@@ -67,7 +67,7 @@ const contactForm = new ContactForm(cloneTemplate(contactFormTemplate), events);
 function updateModalButton() {
   const product = productsApiModel.getSelectedProduct();
   if (!product) return;
-  
+
   modalCard.buttonText = cartModel.hasItem(product.id)
     ? "Удалить из корзины"
     : "Купить";
@@ -135,13 +135,13 @@ events.on("selectedCard:basketAction", () => {
 // открытие модального окна с формой заказа
 events.on("basket:submit", () => {
   const buyer = buyerModel.getBuyerData();
- 
+
   modal.render({
     content: orderForm.render({
       address: buyer.address,
       payment: buyer.payment,
       valid: false,
-      errors: [],  
+      errors: [],
     }),
   });
 });
@@ -149,13 +149,13 @@ events.on("basket:submit", () => {
 // Подтверждение формы заказа
 events.on("order:submit", () => {
   const buyer = buyerModel.getBuyerData();
- 
+
   modal.render({
     content: orderForm.render({
       email: buyer.email,
       phone: buyer.phone,
       valid: false,
-      errors: [],  
+      errors: [],
     }),
   });
 });
@@ -171,14 +171,11 @@ events.on("basket:changed", () => {
       },
     }).render({ ...item, itemNumber });
   });
-
-  // updateModalButton();
-
   cart.render({ content: itemsHTMLArray, price: cartModel.getTotalPrice() });
 });
 
 //удаление товара из корзины
-events.on("basket:remove", (product:IProduct) => {
+events.on("basket:remove", (product: IProduct) => {
   cartModel.removeItem(product);
 });
 
@@ -186,7 +183,6 @@ events.on("basket:remove", (product:IProduct) => {
 events.on("basket:open", () => {
   modal.render({ content: cart.render() });
   modal.open();
-  
 });
 
 // Изменился способ оплаты
@@ -271,7 +267,6 @@ events.on("contacts:submit", () => {
       modal.open();
       buyerModel.clear();
       cartModel.clear();
-      header.render({ counter: 0 });
     })
     .catch((error) => {
       console.error("Ошибка при отправке заказа:", error);
